@@ -1,33 +1,30 @@
 ---
-title: Side Quest: a local AI that gives you three things to find, then tells you to put your phone away
+title: Side Quest: A Local AI That Sends You Outside (and Then Gets Out of the Way)
 published: false
 tags: devchallenge, hf26challenge, ai, opensource
-cover_image:
 ---
 
 *This is a submission for the [Hacktoberfest Open-Source AI Challenge: Week 1 — Touch Grass](https://dev.to/challenges/hacktoberfest-week1-2026-10-05).*
 
-<!-- ✍️ = only you can write this. Everything else is drafted from the build; edit it into your own voice.
-     Note: the Week 1 deadline was Oct 11, 11:59 PM PDT (Oct 12, 12:29 PM IST). Check whether late entries are accepted before tagging it. -->
-
 ## What I Built
 
-<!-- ✍️ One honest opening line about you and screens. e.g. "I open my phone to check the time and look up 40 minutes later." -->
+I know I should go outside more. What usually stops me isn't time, it's not having a reason. I'd open my laptop 'for five minutes' and look up an hour later.
 
-**Side Quest** turns "I should go outside" into a tiny, specific mission:
+**Side Quest** gives you that reason. You tell it how long you have and where you are, and a local AI gives you one small quest:
 
-1. Tell it how long you have and where you are. It's a 10-second screen.
-2. Gemma writes one quest: **three things to find**, a two-minute sit spot, and a time to turn back.
-3. The app goes dark: *Phone away.*
-4. When you're back, you snap your finds. **Gemma's vision checks them locally**, and Gemma writes a short field-journal entry from what you actually found.
+- **three things to find** (like "a bird you can hear but not see")
+- **a two-minute sit spot** (stop and listen)
+- **a time to turn back**
 
-Then it shows the only number it cares about: **minutes outside vs minutes on screen.**
-<!-- ✍️ Add your real numbers from a real walk, e.g. "My first quest: 31 minutes outside, 2 on screen." -->
+Then the screen goes dark and says **"Phone away."** When you're back, you snap your finds, the AI checks your photos, and it writes a short journal entry about your walk.
+
+The only number it shows you at the end is **minutes outside vs minutes on screen.**
 
 ## Demo
 
-<!-- ✍️ Add a GIF or 60–90 s video: pick options → quest card → "Phone away" → photos checked → journal + ratio bar.
-     Bonus points from the judges if you take it outside, so add a real walk and real photos. -->
+![Side Quest screenshot 1](https://raw.githubusercontent.com/ananya-in-tech/week-1-touch-grass/main/imgs/Screenshot%202026-10-12%20134555.png)
+![Side Quest screenshot 2](https://raw.githubusercontent.com/ananya-in-tech/week-1-touch-grass/main/imgs/Screenshot%202026-10-12%20134601.png)
+![Side Quest screenshot 3](https://raw.githubusercontent.com/ananya-in-tech/week-1-touch-grass/main/imgs/Screenshot%202026-10-12%20134943.png)
 
 ## Code
 
@@ -35,42 +32,30 @@ Then it shows the only number it cares about: **minutes outside vs minutes on sc
 
 ## How I Built It
 
-```
-Phone/laptop browser → FastAPI → SQLite + photos (on disk)
-                          └────→ Ollama on 127.0.0.1 → Gemma 4 E2B (text + vision)
-```
+- **Model:** Gemma 4 (E2B), running locally through Ollama. No cloud API.
+- **Backend:** Python + FastAPI, SQLite for storage.
+- **Frontend:** a small mobile-friendly web page with no build step.
 
-- **Quest writer:** Gemma 4 E2B returns JSON constrained by a schema, validated with Pydantic. A rules layer then:
-  - **gives it the right season.** My first quests in India were all "autumn colour hunts" with red maple leaves. In India, October is post-monsoon. Side Quest now uses Indian seasons for Indian timezones, and the quests switched to lush green, flowers and migrating birds.
-  - **keeps it safe.** A filter swaps out anything about eating, picking, touching or feeding animals, climbing, entering water or crossing roads, and tells you what it swapped. Look, listen, photograph.
-  - **forces a real time limit.** "When the shadows lengthen" isn't a turn-back time, so if the model doesn't say "30 minutes", code does.
-- **Photo checker:** every photo is decoded, rotated and **re-encoded with no metadata** (GPS gone), shrunk to 768 px, then shown to Gemma's vision with the quest item. It answers yes / maybe / no plus what it actually sees. It's told to be generous: the point is that you went and looked.
-- **Field journal:** written only from facts: finds, what you noticed at the sit spot, minutes outside, minutes on screen. Text you typed is passed as data, never as instructions.
-- **Screen-time counter:** the page counts the seconds it is actually visible during a quest, including glances at the card outside.
-- **Works without AI:** if Ollama is off, quests come from a built-in deck and photos are saved unchecked.
+Gemma does three jobs:
 
-**Numbers (CPU-only laptop, i5-1240P, 12 GB RAM, no GPU):** quest 20–25 s, photo check 14–29 s, journal ~9 s once warm. A cold vision load takes ~2.5 minutes, so the app warms the model up at start. 20 automated tests cover the safety filter, location stripping, offline fallback and the full walk flow.
+1. **Writes the quest.** It returns structured JSON that the app validates. A small rules layer keeps quests safe (no eating, touching animals, climbing or going near water) and makes sure there's always a real time limit.
+2. **Checks your photos.** Gemma's vision looks at each photo and says whether it matches the find. Before that, the app removes all location data from the photo.
+3. **Writes your journal.** It uses only what you actually found and noticed, so it doesn't make things up.
+
+If the AI is off, Side Quest still works using a built-in set of quests.
 
 ## Why Open Innovation Matters Here
 
-- **Your walks are location data.** A quest app that sends photos to a cloud API sends *where you walk and when*. Here, photos never leave the computer, and location data is removed before the model even sees them.
-- **It costs nothing to use every day.** No API key, no per-photo bill, so there's no reason to limit how often you go outside.
-- **I could make the model behave for my place.** Prompt rules, a safety layer and region-aware seasons on top of an open model that I run myself. Swapping Gemma sizes is one line in `.env`.
-- **It still works when the internet doesn't.** Quests fall back to an offline deck, and the card needs no network once loaded.
-<!-- ✍️ Add where open worked better than closed for you, in your own words. -->
+- **Privacy:** photos from a walk reveal where you live and where you go. With a local model they never leave my computer, and the location data is stripped before the model even sees them.
+- **Free to use:** no API key and no per-photo cost, so there's no reason to ration walks.
+- **I can shape it:** with an open model I could tune it for where I live. For example, my first quests said "autumn leaves", but October in India is post-monsoon, so I made the seasons region-aware.
 
 ## What Went Wrong
 
-- Every quest was "autumn" in October, in India. Fixed with region-aware seasons.
-- The model wrote vague turn-back cues. Fixed by enforcing a real time limit in code.
-- The journal said "you only *photographed* two minutes of the quest". It misread my screen-time fact. Fixed by rewording the fact so it can't be misread.
-- A cold vision load takes ~2.5 minutes on CPU. Fixed with a warm-up at start.
-<!-- ✍️ Add what happened on your real walk. -->
+- Early quests used the wrong season for India. I fixed it with region-aware seasons.
+- The AI sometimes gave vague turn-back times like "when the shadows lengthen". The app now always sets a real time limit.
+- On a laptop with no GPU, the first photo check took about 2.5 minutes while the model loaded. The app now loads the model when it starts.
 
-## Taking It Outside
+## Prize Category
 
-<!-- ✍️ Required for bonus points: go on 1–2 real quests. Where, how long, which finds, what Gemma said about your photos, your outside-vs-screen numbers. One honest surprise. -->
-
-## Prize Categories
-
-**Best Use of Gemma:** Gemma 4 E2B runs locally through Ollama and does all three AI jobs: quest writing (structured output), photo checking (vision) and the field journal.
+**Best Use of Gemma:** Gemma 4 runs locally and powers quest writing, photo checking (vision) and the journal.
