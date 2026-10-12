@@ -1,0 +1,18 @@
+# Render Blueprint: free demo deploy (AI off, offline quest deck).
+# Gemma needs ~6 GB RAM, more than Render's free 512 MB, so the full AI experience runs locally.
+services:
+  - type: web
+    name: side-quest
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn sidequest.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: AI_ENABLED
+        value: "false"
+      - key: AI_WARMUP
+        value: "false"

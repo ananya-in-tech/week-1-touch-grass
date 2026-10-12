@@ -33,8 +33,25 @@ def facts_for(q: dict, outside_seconds: int) -> list[str]:
     return facts
 
 
-def template(facts: list[str]) -> str:
-    return " ".join(facts)
+def template(q: dict, outside_seconds: int) -> str:
+    """A readable entry without the model (offline deck / demo server)."""
+    photos = {p["idx"]: p for p in q.get("photos", [])}
+    found = [f["what"].lower() for i, f in enumerate(q["finds"]) if photos.get(i, {}).get("match") in ("yes", "maybe", "unchecked")]
+    missed = [f["what"].lower() for i, f in enumerate(q["finds"]) if i not in photos]
+    parts = [f"{q['title']}: you spent {minutes_label(outside_seconds)} outside."]
+    if found:
+        parts.append("You found " + _join(found) + ".")
+    if missed:
+        parts.append(("Still out there for next time: " if found else "Next time, look for ") + _join(missed) + ".")
+    if q.get("heard"):
+        parts.append(f"At your sit spot you noticed {q['heard'].rstrip('.')}.")
+    if q.get("screen_seconds") is not None:
+        parts.append(f"Your screen was on for just {minutes_label(q['screen_seconds'])}.")
+    return " ".join(parts)
+
+
+def _join(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
 PROMPT = """Write a 3-4 sentence field-journal entry about someone's short walk outside.
@@ -46,14 +63,14 @@ Facts:
 {facts}"""
 
 
-async def write(facts: list[str]) -> tuple[str, str, int | None]:
+async def write(facts: list[str], fallback: str) -> tuple[str, str, int | None]:
     """Returns (text, source, latency_ms)."""
     try:
         reply = await ai.chat([{"role": "user", "content": PROMPT.format(facts="\n".join(f"- {f}" for f in facts))}],
                               temperature=0.4, num_predict=160)
     except ai.AiUnavailable:
-        return template(facts), "template", None
+        return fallback, "template", None
     text = " ".join(re.sub(r"[*#`_>|]+", "", reply.content).split())[:600]
     if len(text) < 30:
-        return template(facts), "template", reply.latency_ms
+        return fallback, "template", reply.latency_ms
     return text, "ai", reply.latency_ms

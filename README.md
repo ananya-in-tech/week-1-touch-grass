@@ -55,6 +55,14 @@ Open http://localhost:8010. To use it on your phone, join the same Wi-Fi and ope
 .venv/Scripts/python -m pytest -q
 ```
 
+## Deploy (free demo on Render)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ananya-in-tech/week-1-touch-grass)
+
+[`render.yaml`](render.yaml) sets up a free web service with AI turned off. Gemma needs about 6 GB of RAM and Render's free instances have 512 MB, so the hosted demo serves quests from the offline deck and saves photos without checking them. The full Gemma experience runs locally.
+
+Free instances sleep after 15 minutes idle (the first visit then takes about a minute) and reset stored quests on restart.
+
 ## Privacy
 
 - Inference only on `127.0.0.1`; the app refuses to start with a remote host or a `:cloud` model unless `ALLOW_REMOTE_AI=true`.

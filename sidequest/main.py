@@ -160,7 +160,7 @@ async def finish(qid: int, body: FinishRequest):
     q = _public(_get(qid))
     facts = journal.facts_for(q, q["outside_seconds"] or 0)
     t = time.perf_counter()
-    text, source, _ = await journal.write(facts)
+    text, source, _ = await journal.write(facts, journal.template(q, q["outside_seconds"] or 0))
     db().log_ai("journal", int((time.perf_counter() - t) * 1000), source == "ai")
     db().update_quest(qid, status="done", journal=text, journal_source=source)
     return _public(_get(qid))

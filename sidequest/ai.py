@@ -42,7 +42,8 @@ async def health() -> dict:
     s = get_settings()
     base = {"model": s.ollama_model, "local": s.ai_is_local, "enabled": s.ai_enabled}
     if not s.ai_enabled:
-        return base | {"available": False, "message": "AI is turned off."}
+        return base | {"available": False,
+                       "message": "Demo server: quests come from the offline deck. Run Side Quest locally for Gemma."}
     try:
         models = [m.model for m in (await AsyncClient(host=s.ollama_host, timeout=3).list()).models]
     except Exception:
