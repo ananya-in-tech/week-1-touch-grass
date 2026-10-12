@@ -3,7 +3,7 @@
 **Tiny outdoor quests from a local AI. The screen is the shortest part.**
 
 Built for the [Hacktoberfest 2026 Open-Source AI Challenge, Week 1: Touch Grass](https://dev.to/challenges/hacktoberfest-week1-2026-10-05) (Oct 5–11, 2026, due 11:59 PM PDT / Oct 12, 12:29 PM IST).
-Post draft: [SUBMISSION.md](SUBMISSION.md)
+Post draft: [SUBMISSION.md](SUBMISSION.md) · Live demo: [side-quest-vpar.onrender.com](https://side-quest-vpar.onrender.com)
 
 ## How it works
 
@@ -56,6 +56,8 @@ Open http://localhost:8010. To use it on your phone, join the same Wi-Fi and ope
 ```
 
 ## Deploy (free demo on Render)
+
+**Live demo:** https://side-quest-vpar.onrender.com (offline quest deck, AI off)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ananya-in-tech/week-1-touch-grass)
 

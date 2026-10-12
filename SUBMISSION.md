@@ -22,6 +22,10 @@ The only number it shows you at the end is **minutes outside vs minutes on scree
 
 ## Demo
 
+**Live demo:** [side-quest-vpar.onrender.com](https://side-quest-vpar.onrender.com)
+
+The live demo runs on Render's free tier, which doesn't have enough memory for Gemma, so it serves quests from the built-in offline deck. The full experience, with Gemma writing quests and checking photos, runs locally and is shown in the screenshots below. If the demo takes a minute to load, the free server is waking up.
+
 ![Side Quest screenshot 1](https://raw.githubusercontent.com/ananya-in-tech/week-1-touch-grass/main/imgs/Screenshot%202026-10-12%20134555.png)
 ![Side Quest screenshot 2](https://raw.githubusercontent.com/ananya-in-tech/week-1-touch-grass/main/imgs/Screenshot%202026-10-12%20134601.png)
 ![Side Quest screenshot 3](https://raw.githubusercontent.com/ananya-in-tech/week-1-touch-grass/main/imgs/Screenshot%202026-10-12%20134943.png)
