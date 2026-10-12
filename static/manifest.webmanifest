@@ -1,0 +1,10 @@
+{
+  "name": "Side Quest",
+  "short_name": "Side Quest",
+  "description": "Tiny outdoor quests from a local AI. The screen is the shortest part.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f3ea",
+  "theme_color": "#1f3d2b",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
